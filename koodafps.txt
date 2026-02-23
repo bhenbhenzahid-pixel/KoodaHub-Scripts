@@ -1,88 +1,160 @@
 --========================
 -- KOODA HUB - FPS DEVOUR
--- (need auras) - Quantum Cloner spam for FPS boost
+-- (Quantum Cloner spam for FPS boost - need auras)
 --========================
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local backpack = player:WaitForChild("Backpack")
-local Lighting = game:GetService("Lighting")
-local CoreGui = game.CoreGui
+task.wait(1)
 
--- Cleanup old UI if exists
-local oldUI = CoreGui:FindFirstChild("KoodaHubFPSDevourUI")
-if oldUI then
-    oldUI:Destroy()
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local Backpack = LocalPlayer:WaitForChild("Backpack")
+
+-- Remove old UI
+local old = game.CoreGui:FindFirstChild("KoodaHubFPSDevourUI")
+if old then
+    old:Destroy()
 end
 
--- Disable shadows & lighting effects for FPS boost
+-- FPS BOOST
 Lighting.GlobalShadows = false
 Lighting.EnvironmentDiffuseScale = 0
 Lighting.EnvironmentSpecularScale = 0
 
--- Create new UI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "KoodaHubFPSDevourUI"
-ScreenGui.Parent = CoreGui
-ScreenGui.ResetOnSpawn = false
+for _, v in ipairs(Lighting:GetChildren()) do
+    if v:IsA("PostEffect") then
+        v.Enabled = false
+    end
+end
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 340, 0, 160)
-MainFrame.Position = UDim2.new(0.5, -170, 0.5, -80)
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
+for _, v in ipairs(workspace:GetDescendants()) do
+    if v:IsA("ParticleEmitter") then
+        v.Enabled = false
+    end
+end
 
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 18)
+-- CHARACTER CLEAN 
+local function cleanCharacter(char)
+    if char == LocalPlayer.Character then return end
+    for _, a in ipairs(char:GetChildren()) do
+        if a:IsA("Accessory") then
+            a:Destroy()
+        end
+    end
+    char.ChildAdded:Connect(function(c)
+        if c:IsA("Accessory") then
+            c:Destroy()
+        end
+    end)
+end
 
-local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.Size = UDim2.new(1, -20, 0, 40)
-Title.Position = UDim2.new(0, 10, 0, 10)
-Title.BackgroundTransparency = 1
-Title.Text = "Kooda Hub FPS Devour"
-Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 20
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.TextColor3 = Color3.new(1, 1, 1)
+for _, h in ipairs(workspace:GetDescendants()) do
+    if h:IsA("Humanoid") then
+        cleanCharacter(h.Parent)
+    end
+end
 
-local Button = Instance.new("TextButton")
-Button.Parent = MainFrame
-Button.Size = UDim2.new(1, -40, 0, 54)
-Button.Position = UDim2.new(0, 20, 0, 80)
-Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Button.Text = "FPS Devour (need auras)"
-Button.Font = Enum.Font.GothamBold
-Button.TextSize = 15
-Button.TextColor3 = Color3.new(1, 1, 1)
-Button.BorderSizePixel = 0
-Button.AutoButtonColor = true
+workspace.DescendantAdded:Connect(function(d)
+    if d:IsA("Humanoid") then
+        task.wait(0.1)
+        cleanCharacter(d.Parent)
+    end
+end)
 
-local ButtonCorner = Instance.new("UICorner", Button)
-ButtonCorner.CornerRadius = UDim.new(0, 14)
+-- GUI 
+local gui = Instance.new("ScreenGui")
+gui.Name = "KoodaHubFPSDevourUI"
+gui.Parent = game.CoreGui
+gui.ResetOnSpawn = false
 
--- Button function
-Button.MouseButton1Click:Connect(function()
-    Button.Text = "WORKING..."
-    Button.AutoButtonColor = false
+local main = Instance.new("Frame")
+main.Parent = gui
+main.Size = UDim2.new(0, 230, 0, 125)
+main.Position = UDim2.new(0.5, -115, 0.5, -62)
+main.BackgroundColor3 = Color3.fromRGB(0, 170, 255) -- light blue neon
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
 
-    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    local cloner = backpack:FindFirstChild("Quantum Cloner")
+local mainCorner = Instance.new("UICorner", main)
+mainCorner.CornerRadius = UDim.new(0, 22)
 
-    if humanoid and cloner then
-        humanoid:EquipTool(cloner)
-        task.wait()
-        for _, child in pairs(backpack:GetChildren()) do
-            task.wait()
-            cloner:Activate()
+local stroke = Instance.new("UIStroke", main)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(180, 235, 255)
+stroke.Transparency = 0.15
+
+-- Main title
+local title = Instance.new("TextLabel")
+title.Parent = main
+title.Size = UDim2.new(1, -16, 0, 24)
+title.Position = UDim2.new(0, 8, 0, 6)
+title.BackgroundTransparency = 1
+title.Text = "Kooda Hub FPS Devour"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextXAlignment = Enum.TextXAlignment.Center
+title.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Button
+local button = Instance.new("TextButton")
+button.Parent = main
+button.Size = UDim2.new(1, -40, 0, 44)
+button.Position = UDim2.new(0, 20, 0, 54)
+button.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- white button
+button.Text = "Devour"
+button.Font = Enum.Font.GothamBold
+button.TextSize = 18
+button.TextColor3 = Color3.fromRGB(0, 140, 220)
+button.BorderSizePixel = 0
+button.AutoButtonColor = true
+
+local btnCorner = Instance.new("UICorner", button)
+btnCorner.CornerRadius = UDim.new(0, 16)
+
+-- BUTTON LOGIC
+local originalText = "Devour"
+
+button.MouseButton1Click:Connect(function()
+    button.Text = "WORKING"
+    button.AutoButtonColor = false
+
+    local char = LocalPlayer.Character
+    if not char then
+        button.Text = "ERROR"
+        task.wait(1)
+        button.Text = originalText
+        button.AutoButtonColor = true
+        return
+    end
+
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    local tool = Backpack:FindFirstChild("Quantum Cloner")
+
+    if not humanoid or not tool then
+        button.Text = "ERROR"
+        task.wait(1)
+        button.Text = originalText
+        button.AutoButtonColor = true
+        return
+    end
+
+    -- Equip and activate tool
+    humanoid:EquipTool(tool)
+    task.wait(0.1)
+
+    for _, t in ipairs(Backpack:GetChildren()) do
+        if t:IsA("Tool") then
+            t.Parent = char
         end
     end
 
-    task.delay(0.5, function()
-        Button.Text = "FPS Devour (need auras)"
-        Button.AutoButtonColor = true
+    task.wait(0.1)
+    tool:Activate()
+
+    task.delay(0.6, function()
+        button.Text = originalText
+        button.AutoButtonColor = true
     end)
 end)
